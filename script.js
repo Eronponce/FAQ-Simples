@@ -4,16 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchCategories() {
-    // Simulando a resposta do servidor com categorias
     const categories = ['ensalamentos', 'outraCategoria']; // Substitua isso com uma chamada fetch real para o servidor
 
-    const categoryContainer = document.getElementById('category-container');
+    const categoryContainer = document.getElementById('category-buttons');
     categories.forEach(category => {
-        const categoryItem = document.createElement('button');
-        categoryItem.className = 'category-item';
-        categoryItem.innerText = capitalizeFirstLetter(category);
-        categoryItem.addEventListener('click', () => showCategory(category));
-        categoryContainer.appendChild(categoryItem);
+        const categoryButton = document.createElement('button');
+        categoryButton.className = 'button';
+        categoryButton.innerText = capitalizeFirstLetter(category);
+        categoryButton.addEventListener('click', () => fillSearchWithCategory(category));
+        categoryContainer.appendChild(categoryButton);
     });
 }
 
@@ -30,28 +29,6 @@ function fetchFaqs() {
             });
     });
 }
-
-function showCategory(category) {
-    const faqItems = document.querySelectorAll('.faq-item');
-
-    // Limpa o conteúdo atual
-    const faqContent = document.getElementById('faq-content');
-    faqContent.innerHTML = '';
-
-    // Adiciona o título da categoria
-    const categoryTitle = document.createElement('h2');
-    categoryTitle.innerText = capitalizeFirstLetter(category);
-    faqContent.appendChild(categoryTitle);
-
-    // Mostra apenas os itens da categoria selecionada
-    faqItems.forEach(item => {
-        if (item.dataset.category === category) {
-            faqContent.appendChild(item.cloneNode(true));
-            item.style.display = 'block';
-        }
-    });
-}
-
 function markdownToHtml(markdown, category) {
     const lines = markdown.split('\n');
     let html = '';
@@ -62,10 +39,24 @@ function markdownToHtml(markdown, category) {
             if (inFaqItem) {
                 html += '</div>';
             }
-            html += `<div class="faq-item" data-category="${category}" style="display: block;"><h3>${line.substring(3)}</h3>`;
+            html += `<div class="faq-item ${category}" style="display: block;"><h3>${line.substring(3)}</h3>`;
             inFaqItem = true;
         } else if (line.trim() === '') {
             // Skip empty lines
+        } else if (line.startsWith('![')) {
+            const match = line.match(/!\[(.*?)\]\((.*?)\)/);
+            if (match) {
+                const altText = match[1];
+                const src = match[2];
+                html += `<img src="${src}" alt="${altText}" />`;
+            }
+        } else if (line.startsWith('[')) {
+            const match = line.match(/\[(.*?)\]\((.*?)\)/);
+            if (match) {
+                const linkText = match[1];
+                const href = match[2];
+                html += `<a href="${href}" target="_blank">${linkText}</a>`;
+            }
         } else {
             html += `<p>${line}</p>`;
         }
@@ -78,21 +69,35 @@ function markdownToHtml(markdown, category) {
     return html;
 }
 
+
 function addSearchFunctionality() {
     const searchInput = document.getElementById('search');
     searchInput.addEventListener('keyup', function () {
-        const input = normalizeText(searchInput.value.toLowerCase());
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const question = normalizeText(item.querySelector('h3').innerText.toLowerCase());
-            const answer = normalizeText(item.querySelector('p').innerText.toLowerCase());
-            if (question.includes(input) || answer.includes(input)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+        performSearch();
     });
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('search');
+    const input = normalizeText(searchInput.value.toLowerCase());
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+        const question = normalizeText(item.querySelector('h3').innerText.toLowerCase());
+        const answer = normalizeText(item.querySelector('p').innerText.toLowerCase());
+        const className = normalizeText(item.className.toLowerCase());
+        if (question.includes(input) || answer.includes(input) || className.includes(input)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function fillSearchWithCategory(category) {
+    const searchInput = document.getElementById('search');
+    searchInput.value = category;
+    performSearch(); // Execute search to filter results immediately
 }
 
 function normalizeText(text) {
