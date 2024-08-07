@@ -105,3 +105,26 @@ body {
     overflow: hidden;
     
   }
+
+  .faq-item {
+    max-height: 100px; /* Altura máxima inicial */
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    position: relative; /* Adiciona posição relativa para conter o conteúdo */
+}
+
+.faq-item.expanded {
+    max-height: 1000px; /* Altura maior para a expansão */
+}
+
+.faq-item p {
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: -webkit-line-clamp 0.5s ease;
+}
+
+.faq-item.expanded p {
+    -webkit-line-clamp: unset; /* Mostra todas as linhas ao expandir */
+}

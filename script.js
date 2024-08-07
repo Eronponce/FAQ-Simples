@@ -26,9 +26,11 @@ function fetchFaqs() {
                 const faqContent = document.getElementById('faq-content');
                 faqContent.innerHTML += markdownToHtml(markdown, category);
                 addSearchFunctionality();
+                addHoverEffect(); // Adiciona o efeito de hover
             });
     });
 }
+
 function markdownToHtml(markdown, category) {
     const lines = markdown.split('\n');
     let html = '';
@@ -69,7 +71,6 @@ function markdownToHtml(markdown, category) {
     return html;
 }
 
-
 function addSearchFunctionality() {
     const searchInput = document.getElementById('search');
     searchInput.addEventListener('keyup', function () {
@@ -81,10 +82,14 @@ function performSearch() {
     const searchInput = document.getElementById('search');
     const input = normalizeText(searchInput.value.toLowerCase());
     const faqItems = document.querySelectorAll('.faq-item');
-    
+
     faqItems.forEach(item => {
         const question = normalizeText(item.querySelector('h3').innerText.toLowerCase());
-        const answer = normalizeText(item.querySelector('p').innerText.toLowerCase());
+        const paragraphs = item.querySelectorAll('p');
+        let answer = '';
+        paragraphs.forEach(p => {
+            answer += normalizeText(p.innerText.toLowerCase()) + ' ';
+        });
         const className = normalizeText(item.className.toLowerCase());
         if (question.includes(input) || answer.includes(input) || className.includes(input)) {
             item.style.display = 'block';
@@ -98,6 +103,18 @@ function fillSearchWithCategory(category) {
     const searchInput = document.getElementById('search');
     searchInput.value = category;
     performSearch(); // Execute search to filter results immediately
+}
+
+function addHoverEffect() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        item.addEventListener('mouseover', () => {
+            item.classList.add('expanded');
+        });
+        item.addEventListener('mouseout', () => {
+            item.classList.remove('expanded');
+        });
+    });
 }
 
 function normalizeText(text) {
