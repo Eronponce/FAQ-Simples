@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchCategories() {
-    const categories = ['ensalamentos', 'outraCategoria']; // Substitua isso com uma chamada fetch real para o servidor
+    const categories = ['ensalamentos', 'provas']; // Substitua isso com uma chamada fetch real para o servidor
 
     const categoryContainer = document.getElementById('category-buttons');
     categories.forEach(category => {
@@ -17,7 +17,7 @@ function fetchCategories() {
 }
 
 function fetchFaqs() {
-    const categories = ['ensalamentos', 'outraCategoria']; // Substitua isso com uma chamada fetch real para o servidor
+    const categories = ['ensalamentos', 'provas']; // Substitua isso com uma chamada fetch real para o servidor
 
     categories.forEach(category => {
         fetch(`faqs/${category}.md`)
